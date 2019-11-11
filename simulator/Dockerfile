@@ -4,10 +4,15 @@ RUN mkdir -p /usr/src/app
 
 WORKDIR /usr/src/app
 
-COPY . .
+# Copy package and source files
+COPY package.json .
+COPY package-lock.json .
+COPY src/ .
 
-RUN npm install
+# Install packages
+RUN npm install -g
+RUN npm install --only-dev # Dev dependencies
 
 EXPOSE 8080
 
-CMD [ "node", "app.js" ]
+CMD ["npm", "run", "dev"]
