@@ -2,7 +2,7 @@
 
 | Date  |      Hours    | Activity                                       |
 | ----------- | ------- |------------------------------------------------
-| 2019-11-04  | 1       | Read through the REST-api link.                |
-| 2019-11-05  | 3       | Setup the Web server together and created our first RESTful API endpoint.  Had some troubles with the web server not having permissions to a needed directory.|
-| 2019-11-04  | 2       | Worked with Lelle and created two more endpoints (read wind, read electricity)|                       
-| 2019-11-05  | 1       | Discussions with Lelle about how to properly secure the REST apis |
+| 2019-11-04  | 3       | Discussed and decided on a initial system architecture. Set up a docker image/service for the simulator and started research and implement the GrahpQL endpoint.             |
+|2019-11-04   | 1       | Add linting and code formatting standards using eslint and prettier|
+|2019-11-11   | 2				| Discussed how to split the work and started working on the graphql schema |
+|2019-11-11   | 3				| Fixed automatic restart of simulator and continued working on the graphql schema. Also helped out with the windspeed model.|
