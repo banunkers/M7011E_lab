@@ -1,9 +1,6 @@
 name: Simulator CI
 
-on: 
-  pull_request:
-    paths: 
-      - 'simulator/**'
+on: pull_request
   
 
 jobs:
