@@ -26,4 +26,36 @@
 | 2019-12-9  | 4     | Research and start implementing front-end                                                                                                                        |
 | 2019-12-10 | 5     | Started working on the front-end by setting up basic pages                                                                                                       |
 | 2019-12-11 | 8     | Implemented and wrote test for authentication between the client and server                                                                                      |
-| 2019-12-12 | 9     | Started moving the token generation and login process to the api instead of the server and started implementing authentication in the api
+| 2019-12-12 | 9     | Started moving the token generation and login process to the api instead of the server and started implementing authentication in the api												|
+| 2019-12-14 | 5     | Fixed authentication on the front-end and api layers. Also implemented registration process and storing of user emails and (hashed+salted) passwords.						|
+| 2019-12-17 | 6     | Reworked a lot of the authentication and implemented separate authentication for managers and prosumers |
+| 2019-12-17 | 6     | Finished up the authentication and registration process by writing tests |
+| 2019-12-17 | 0.5 	 | Merged all docker-compose files into one |
+| 2019-12-18 | 5 	 | Fixed some bug in the authentication and started working with picture uploading|
+| 2019-12-18 | 2 	 | Continue working on picture uploading |
+| 2019-12-19 | 3 	 | Worked some more on picture uploading, didn't get anywhere |
+| 2019-12-21 | 4 	 | Managed to get uploading/retrieving and displaying images working, still needs some more work to increase robustness though |
+| 2019-12-23 | 3 	 | Rewrote a schema query to use a GraphQLUnion type|
+| 2019-12-25 | 5 	 | Implement functionalities for updating email, password and deleting accounts, and wrote tests for some of said functionalities. Also fixed an issues with linting |
+| 2019-12-29 | 3 	 | Implement displaying the prosumer's current and maximal battery power/capacity on the profile page, and implemented functionality to change the maxmimal battery capacity|
+| 2019-12-29 | 2 	 | Started researching on how to best fetch data dynamically and implemented dynamic data fetching for the current battery power on the prosumers profile page|
+| 2019-01-01 | 3 	 | Started working on a navbar |
+| 2019-01-03 | 3 	 | Finished the navbar |
+| 2019-01-03 | 1 	 | Tried to debug an issue with sliders and managed some issues and pull requests|
+| 2019-01-03 | 1 	 | Implemented telling the client if the email they try to register already exists|
+| 2019-01-04 | 6   | Started implementing a system for the manager to view prosumers' system |
+| 2019-01-05 | 1   | Finished (?) the manager's prosumer viewing system and updated an error message |
+| 2019-01-06 | 1   | Tried to implement graphs |
+| 2019-01-07 | 2   | Add missing routes to the navbar, and added the navbar to new pages. Also worked a bit on the server's authentication|
+| 2019-01-07 | 5   | Managed to get graphs and historic data working together using current wind speed, and started working on adding graphs for current production as well|
+| 2019-01-08 | 7   | Continued working on graphs and tried to debug a performance problem with the GraphQL-API |
+| 2019-01-09 | 5   | Worked on stabilizing the login system a bit and implemented functionality for managers to block a prosumer from selling to the market |
+| 2019-01-10 | 8   | Merged pull requests and started setting up a remote server on AWS|
+| 2019-01-11 | 8   | Fixed some bugs, finished setting up a remote AWS server and implement some battery and authentication features|
+| 2019-01-11 | 3   | Started reworking the design using bootstrap |
+| 2019-01-12 | 1   | Implemented displaying the market demand on the manager's dashboard |
+| 2019-01-12 | 7   | Continued working on the design and other minor stuff|
+| 2019-01-15 | 8   | Started working on the report |
+| 2019-01-16 | 8   | Continued working on the report and fixed bugs|
+| 2019-01-17 | 8	 | Same as previous day |
+| 2019-01-18 | 8	 | Same as previous day |
