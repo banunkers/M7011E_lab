@@ -26,3 +26,4 @@
 | 2019-12-9  | 4     | Research and start implementing front-end                                                                                                                        |
 | 2019-12-10 | 5     | Started working on the front-end by setting up basic pages                                                                                                       |
 | 2019-12-11 | 8     | Implemented and wrote test for authentication between the client and server                                                                                      |
+| 2019-12-12 | 9     | Started moving the token generation and login process to the api instead of the server and started implementing authentication in the api
