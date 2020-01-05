@@ -76,6 +76,24 @@ batteryType._typeConfig = {
   uniqueKey: "id"
 };
 
+const windSpeedValueType = new GraphQLObjectType({
+  name: "windSpeedValue",
+  fields: () => ({
+    value: {
+      type: GraphQLFloat,
+      sqlColumn: "value"
+    },
+    dateTime: {
+      type: GraphQLString,
+      sqlColumn: "date_time"
+    }
+  })
+});
+windSpeedValueType._typeConfig = {
+  sqlTable: "windspeed_values",
+  uniqueKey: "id"
+};
+
 const prosumerType = new GraphQLObjectType({
   name: "prosumer",
   fields: () => ({
@@ -87,8 +105,10 @@ const prosumerType = new GraphQLObjectType({
       sqlColumn: "mean_day_wind_speed"
     },
     currentWindSpeed: {
-      type: GraphQLFloat,
-      sqlColumn: "current_wind_speed"
+      type: GraphQLList(windSpeedValueType),
+      sqlTable: "windspeed_values",
+      sqlJoin: (prosumerTable, windSpeedValueTable) =>
+        `${prosumerTable}.id = ${windSpeedValueTable}.prosumer_id`
     },
     currentProduction: {
       type: GraphQLFloat,
@@ -190,7 +210,6 @@ userUnionType._typeConfig = {
 			id, 
 			account_id,
 			mean_day_wind_speed,
-			current_wind_speed,
 			current_consumption,
 			current_production,
 			ratio_excess_market,
@@ -204,7 +223,6 @@ userUnionType._typeConfig = {
 			id, 
 			account_id,
 			NULL as mean_day_wind_speed,
-			NULL as current_wind_speed,
 			NULL as current_consumption,
 			NULL as current_production,
 			NULL as ratio_excess_market,

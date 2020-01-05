@@ -26,7 +26,6 @@ CREATE TABLE prosumers (
 	id SERIAL,
 	account_id INT NOT NULL,
 	mean_day_wind_speed NUMERIC DEFAULT 0.0,
-	current_wind_speed NUMERIC DEFAULT 0.0,
 	current_consumption NUMERIC DEFAULT 0.0,
 	current_production NUMERIC DEFAULT 0.0,
 	ratio_excess_market NUMERIC DEFAULT 0.0,
@@ -56,3 +55,13 @@ CREATE TABLE power_plants (
 	FOREIGN KEY (battery_id) REFERENCES batteries (id)
 );
 ALTER TABLE power_plants OWNER TO gle;
+
+CREATE TABLE windspeed_values (
+	id SERIAL,
+	value NUMERIC NOT NULL,
+	prosumer_id INTEGER NOT NULL,
+	date_time timestamptz NOT NULL,
+	PRIMARY KEY(id),
+	FOREIGN KEY(prosumer_id) REFERENCES prosumers(id)
+);
+ALTER TABLE windspeed_values OWNER TO gle;

@@ -5,21 +5,48 @@ document.addEventListener("DOMContentLoaded", async () => {
   var ctx = document.getElementById("myChart").getContext("2d");
   var timeFormat = "DD/MM/YYYY";
 
+  const authToken = getCookie("authToken", document.cookie);
+  const response = await fetch(API_ADDRESS, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      authToken
+    },
+    body: JSON.stringify({
+      query: `
+				{
+					me{
+						... on prosumer{
+							currentWindSpeed{
+								value
+								dateTime
+							}
+						}
+					}
+				}
+				`
+    })
+  });
+  const json = await response.json();
+  const test = json.data.me.currentWindSpeed[0];
+
+  // Sort by date
+  const sorted = json.data.me.currentWindSpeed.sort(
+    (e1, e2) => parseInt(e1.dateTime) - parseInt(e2.dateTime)
+  );
+  const data = sorted.map(windSpeed => ({
+    x: moment(parseInt(windSpeed.dateTime)),
+    y: windSpeed.value
+  }));
+
   var myChart = new Chart(ctx, {
     type: "line",
     data: {
-      labels: [
-        moment("2006-08-04T00:00:00.000Z"),
-        moment("2007-11-09T00:00:00.000Z")
-      ],
+      labels: [moment()],
       datasets: [
         {
-          data: [
-            { x: moment("2006-08-04T00:00:00.000Z"), y: 177 },
-            { x: moment("2006-09-04T00:00:00.000Z"), y: 160 },
-            { x: moment("2007-09-04T00:00:00.000Z"), y: 177 }
-          ],
           label: "Windspeed",
+          data,
           fill: false,
           borderColor: "red"
         }
@@ -30,7 +57,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         xAxes: [
           {
             type: "time",
-            parser: timeFormat
+            parser: timeFormat,
+            distribution: "linear"
           }
         ]
       }
@@ -44,9 +72,6 @@ async function updateData() {
   const battery = data.me.battery;
   const pricing = data.pricing;
 
-  document.getElementById(
-    "windSpeed"
-  ).innerHTML = prosumer.currentWindSpeed.toFixed(2);
   document.getElementById(
     "production"
   ).innerHTML = prosumer.currentProduction.toFixed(2);

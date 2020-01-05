@@ -29,7 +29,7 @@ function updateProsumerMeanWindSpeed(prosumerId) {
   );
 }
 
-async function updateProsumerTick(prosumerId) {
+async function updateProsumerTick(prosumerId, time) {
   pool
     .query(
       `
@@ -88,11 +88,18 @@ async function updateProsumerTick(prosumerId) {
 
       pool.query(
         `
+      INSERT INTO windspeed_values(value, prosumer_id, date_time)
+      VALUES ($1, $2, $3)
+      `,
+        [currWind, prosumerId, new Date(time).toISOString()]
+      );
+      pool.query(
+        `
 				Update prosumers 
-				SET current_production=$1, current_consumption=$2, current_wind_speed=$3
-				WHERE id=$4
+				SET current_production=$1, current_consumption=$2
+				WHERE id=$3
 				`,
-        [produced, consumed, currWind, prosumerId],
+        [produced, consumed, prosumerId],
         err => {
           if (err) {
             console.error(`Failed to update prosumer: ${err}`);
@@ -103,7 +110,7 @@ async function updateProsumerTick(prosumerId) {
     .catch(err => console.error(err));
 }
 
-function updateProsumers(tickReset) {
+function updateProsumers(tickReset, time) {
   pool.query(
     `
 			SELECT id FROM prosumers
@@ -113,7 +120,7 @@ function updateProsumers(tickReset) {
         console.error(`Failed to fetch prosumers: ${err}`);
       } else {
         res.rows.forEach(prosumer => {
-          updateProsumerTick(prosumer.id);
+          updateProsumerTick(prosumer.id, time);
           if (tickReset) updateProsumerMeanWindSpeed(prosumer.id);
         });
       }
@@ -219,7 +226,7 @@ async function startSimulation({
       tickCount = 0;
       tickReset = true;
     }
-    updateProsumers(tickReset);
+    updateProsumers(tickReset, time);
     updatePowerPlants();
   }, tickInterval);
 }
