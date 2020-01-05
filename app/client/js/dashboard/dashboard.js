@@ -1,6 +1,42 @@
 document.addEventListener("DOMContentLoaded", () => {
   pollFunc(updateData, 10000); // update prosumer data of the dashboard every 10s
 });
+document.addEventListener("DOMContentLoaded", async () => {
+  var ctx = document.getElementById("myChart").getContext("2d");
+  var timeFormat = "DD/MM/YYYY";
+
+  var myChart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: [
+        moment("2006-08-04T00:00:00.000Z"),
+        moment("2007-11-09T00:00:00.000Z")
+      ],
+      datasets: [
+        {
+          data: [
+            { x: moment("2006-08-04T00:00:00.000Z"), y: 177 },
+            { x: moment("2006-09-04T00:00:00.000Z"), y: 160 },
+            { x: moment("2007-09-04T00:00:00.000Z"), y: 177 }
+          ],
+          label: "Windspeed",
+          fill: false,
+          borderColor: "red"
+        }
+      ]
+    },
+    options: {
+      scales: {
+        xAxes: [
+          {
+            type: "time",
+            parser: timeFormat
+          }
+        ]
+      }
+    }
+  });
+});
 
 async function updateData() {
   const data = await getDashboardData();

@@ -9,6 +9,8 @@
     ></script>
     <script type="text/javascript" src="/js/dashboard/ratios.js"></script>
     <script type="text/javascript" src="/js/dashboard/dashboard.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/moment@2.24.0"></script>
+		<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
     <meta charset="UTF-8" />
     <title>Dashboard</title>
   </head>
@@ -19,6 +21,7 @@
 				<h2>Overview</h3>
         <%- include("../partials/prosumerStatsTable") %>
       </div>
+			<canvas id="myChart" width="400" height="400"></canvas>
       <div>
 				<h2>Ratios</h2>
         <div>
