@@ -107,8 +107,23 @@ const prosumerType = new GraphQLObjectType({
     currentWindSpeed: {
       type: GraphQLList(windSpeedValueType),
       sqlTable: "windspeed_values",
-      sqlJoin: (prosumerTable, windSpeedValueTable) =>
-        `${prosumerTable}.id = ${windSpeedValueTable}.prosumer_id`
+      args: {
+        startTime: { type: GraphQLString },
+        endTime: { type: GraphQLString }
+      },
+      sqlJoin: (prosumerTable, windSpeedValueTable, args) =>
+        `${prosumerTable}.id = ${windSpeedValueTable}.prosumer_id
+					${
+            args.startTime
+              ? ` AND ${windSpeedValueTable}.date_time >='${args.startTime}'`
+              : ""
+          }
+					${
+            args.endTime
+              ? ` AND ${windSpeedValueTable}.date_time <='${args.endTime}'`
+              : ""
+          }
+				`
     },
     currentProduction: {
       type: GraphQLFloat,
