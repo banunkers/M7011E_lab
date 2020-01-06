@@ -95,17 +95,31 @@ async function updateProsumerTick(prosumerId, time) {
       );
       pool.query(
         `
-				Update prosumers 
-				SET current_production=$1, current_consumption=$2
-				WHERE id=$3
-				`,
-        [produced, consumed, prosumerId],
-        err => {
-          if (err) {
-            console.error(`Failed to update prosumer: ${err}`);
-          }
-        }
+      INSERT INTO production_values(value, prosumer_id, date_time)
+      VALUES ($1, $2, $3)
+      `,
+        [produced, prosumerId, new Date(time).toISOString()]
       );
+      pool.query(
+        `
+      INSERT INTO consumption_values(value, prosumer_id, date_time)
+      VALUES ($1, $2, $3)
+      `,
+        [consumed, prosumerId, new Date(time).toISOString()]
+      );
+      // pool.query(
+      //   `
+      // Update prosumers
+      // SET current_consumption=$1
+      // WHERE id=$2
+      // `,
+      //   [consumed, prosumerId],
+      //   err => {
+      //     if (err) {
+      //       console.error(`Failed to update prosumer: ${err}`);
+      //     }
+      //   }
+      // );
     })
     .catch(err => console.error(err));
 }
@@ -139,11 +153,39 @@ async function updatePowerPlants() {
   // so this looping is kind of redundant, unless multiple power plants is
   // implemented in the future.
   powerPlants.rows.forEach(async powerPlant => {
+    // Sum all of the latest values with unique prosumer ids for production
+    // and consumption values and take their difference. I.e. the difference
+    // between all prosumers's latest production and consumption.
     const powerDiff = await pool.query(
       `
 				SELECT (
-					(SELECT SUM(current_production) FROM prosumers) - 
-					(SELECT SUM(current_consumption) FROM prosumers)) as diff
+					(
+						SELECT SUM(latest_values.value)
+						FROM (
+							SELECT 
+								DISTINCT ON (prosumer_id)
+								value,
+								date_time
+							FROM production_values
+							ORDER BY
+								prosumer_id,
+								date_time
+						) latest_values
+					) - 
+					(
+						SELECT SUM(latest_values.value)
+						FROM (
+							SELECT 
+								DISTINCT ON (prosumer_id)
+								value,
+								date_time
+							FROM consumption_values
+							ORDER BY
+								prosumer_id,
+								date_time
+						) latest_values
+					)
+				)
 				`
     );
     pool

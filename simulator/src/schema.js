@@ -58,24 +58,6 @@ accountType._typeConfig = {
   uniqueKey: "id"
 };
 
-const batteryType = new GraphQLObjectType({
-  name: "battery",
-  fields: () => ({
-    maxCapacity: {
-      type: GraphQLFloat,
-      sqlColumn: "max_capacity"
-    },
-    power: {
-      type: GraphQLFloat,
-      sqlColumn: "power"
-    }
-  })
-});
-batteryType._typeConfig = {
-  sqlTable: "batteries",
-  uniqueKey: "id"
-};
-
 const windSpeedValueType = new GraphQLObjectType({
   name: "windSpeedValue",
   fields: () => ({
@@ -91,6 +73,42 @@ const windSpeedValueType = new GraphQLObjectType({
 });
 windSpeedValueType._typeConfig = {
   sqlTable: "windspeed_values",
+  uniqueKey: "id"
+};
+
+const productionValueType = new GraphQLObjectType({
+  name: "productionValue",
+  fields: () => ({
+    value: {
+      type: GraphQLFloat,
+      sqlColumn: "value"
+    },
+    dateTime: {
+      type: GraphQLString,
+      sqlColumn: "date_time"
+    }
+  })
+});
+productionValueType._typeConfig = {
+  sqlTable: "production_values",
+  uniqueKey: "id"
+};
+
+const consumptionValueType = new GraphQLObjectType({
+  name: "consumptionValue",
+  fields: () => ({
+    value: {
+      type: GraphQLFloat,
+      sqlColumn: "value"
+    },
+    dateTime: {
+      type: GraphQLString,
+      sqlColumn: "date_time"
+    }
+  })
+});
+consumptionValueType._typeConfig = {
+  sqlTable: "consumption_values",
   uniqueKey: "id"
 };
 
@@ -126,12 +144,46 @@ const prosumerType = new GraphQLObjectType({
 				`
     },
     currentProduction: {
-      type: GraphQLFloat,
-      sqlColumn: "current_production"
+      type: GraphQLList(productionValueType),
+      sqlTable: "production_values",
+      args: {
+        startTime: { type: GraphQLString },
+        endTime: { type: GraphQLString }
+      },
+      sqlJoin: (prosumerTable, productionValuesTable, args) =>
+        `${prosumerTable}.id = ${productionValuesTable}.prosumer_id
+					${
+            args.startTime
+              ? ` AND ${productionValuesTable}.date_time >='${args.startTime}'`
+              : ""
+          }
+					${
+            args.endTime
+              ? ` AND ${productionValuesTable}.date_time <='${args.endTime}'`
+              : ""
+          }
+				`
     },
     currentConsumption: {
-      type: GraphQLFloat,
-      sqlColumn: "current_consumption"
+      type: GraphQLList(consumptionValueType),
+      sqlTable: "consumption_values",
+      args: {
+        startTime: { type: GraphQLString },
+        endTime: { type: GraphQLString }
+      },
+      sqlJoin: (prosumerTable, consumptionValuesTable, args) =>
+        `${prosumerTable}.id = ${consumptionValuesTable}.prosumer_id
+					${
+            args.startTime
+              ? ` AND ${consumptionValuesTable}.date_time >='${args.startTime}'`
+              : ""
+          }
+					${
+            args.endTime
+              ? ` AND ${consumptionValuesTable}.date_time <='${args.endTime}'`
+              : ""
+          }
+				`
     },
     ratioExcessMarket: {
       type: GraphQLFloat,
@@ -158,6 +210,24 @@ const prosumerType = new GraphQLObjectType({
 
 prosumerType._typeConfig = {
   sqlTable: "prosumers",
+  uniqueKey: "id"
+};
+
+const batteryType = new GraphQLObjectType({
+  name: "battery",
+  fields: () => ({
+    maxCapacity: {
+      type: GraphQLFloat,
+      sqlColumn: "max_capacity"
+    },
+    power: {
+      type: GraphQLFloat,
+      sqlColumn: "power"
+    }
+  })
+});
+batteryType._typeConfig = {
+  sqlTable: "batteries",
   uniqueKey: "id"
 };
 
@@ -225,8 +295,6 @@ userUnionType._typeConfig = {
 			id, 
 			account_id,
 			mean_day_wind_speed,
-			current_consumption,
-			current_production,
 			ratio_excess_market,
 			ratio_deficit_market,
 			battery_id,
@@ -238,8 +306,6 @@ userUnionType._typeConfig = {
 			id, 
 			account_id,
 			NULL as mean_day_wind_speed,
-			NULL as current_consumption,
-			NULL as current_production,
 			NULL as ratio_excess_market,
 			NULL as ratio_deficit_market,
 			NULL as battery_id,
