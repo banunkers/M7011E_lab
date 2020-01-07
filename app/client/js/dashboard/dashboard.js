@@ -4,8 +4,11 @@ const PRODUCTION_COLOR = "green";
 const CONSUMPTION_COLOR = "red";
 const WINDSPEED_COLOR = "blue";
 
+// The length (in milliseconds) of the intervals between polling
+const POLL_INTERVAL = 4000;
+
 document.addEventListener("DOMContentLoaded", () => {
-  pollFunc(updateData, 10000); // update prosumer data of the dashboard every 10s
+  pollFunc(updateData, POLL_INTERVAL); // poll prosumer data on intervals
 });
 document.addEventListener("DOMContentLoaded", async () => {
   const authToken = getCookie("authToken", document.cookie);
@@ -33,6 +36,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 async function updateData() {
+  const authToken = getCookie("authToken", document.cookie);
   const data = await getDashboardData();
   const prosumer = data.me;
   const battery = data.me.battery;
@@ -45,6 +49,71 @@ async function updateData() {
   ).innerHTML = `${batteryPower}/${batteryMaxCapacity}`;
 
   document.getElementById("pricing").innerHTML = pricing.toFixed(2);
+
+  const startTime = document.getElementById("start-date-select").value;
+  const endTime = document.getElementById("end-date-select").value;
+
+  // If the end date is not set then the user wants the latest data which should be
+  // polled on every interval
+  if (endTime == "") {
+    if (document.getElementById("windspeed-checkbox").checked) {
+      const response = await fetch(API_ADDRESS, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          authToken
+        },
+        body: JSON.stringify({
+          query: createProsumerQuery("currentWindSpeed", startTime, endTime)
+        })
+      });
+      const json = await response.json();
+
+      replaceChartDataset(
+        "Windspeed",
+        json.data.me.currentWindSpeed,
+        WINDSPEED_COLOR
+      );
+    }
+    if (document.getElementById("production-checkbox").checked) {
+      const response = await fetch(API_ADDRESS, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          authToken
+        },
+        body: JSON.stringify({
+          query: createProsumerQuery("currentProduction", startTime, endTime)
+        })
+      });
+      const json = await response.json();
+
+      replaceChartDataset(
+        "Production",
+        json.data.me.currentProduction,
+        PRODUCTION_COLOR
+      );
+    }
+    if (document.getElementById("consumption-checkbox").checked) {
+      const response = await fetch(API_ADDRESS, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          authToken
+        },
+        body: JSON.stringify({
+          query: createProsumerQuery("currentConsumption", startTime, endTime)
+        })
+      });
+      const json = await response.json();
+
+      replaceChartDataset(
+        "Consumption",
+        json.data.me.currentConsumption,
+        CONSUMPTION_COLOR
+      );
+    }
+  }
 }
 
 /**
@@ -305,15 +374,42 @@ function attachEndDateSelectChangeListeners() {
   };
 }
 
+/*
+ * Construct a query for getting prosumer time-based info.
+ *
+ * Constructs a query in the form
+ * {
+ *   me{
+ *   	... on prosumer{
+ *   		<field><startTime/endTime>{
+ *				value
+ *				dateTime
+ *   		}
+ *   	}
+ *   }
+ * }
+ * In the case of empty/null start/end times these arguments will not be used in the
+ * query.
+ *
+ * @param {String} field The GraphQL field to query on the prosumer
+ * @param {String} startTime The starting time of the query
+ * @param {String} endTime The ending time of the query
+ *
+ * @returns {String} The query string ready for usage.
+ */
 function createProsumerQuery(field, startTime, endTime) {
   return `
 		{
 			me{
 				... on prosumer{
-					${field}(
+					${field}${
+    (startTime != "" && startTime != null) || (endTime != "" && endTime != null)
+      ? `(
 						${startTime != "" && startTime != null ? `startTime: "${startTime}"` : ""}
 						${endTime != "" && endTime != null ? `endTime: "${endTime}"` : ""}
-					){
+					)`
+      : ""
+  }{
 						value
 						dateTime
 					}

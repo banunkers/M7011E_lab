@@ -170,6 +170,7 @@ async function updatePowerPlants() {
 							ORDER BY
 								prosumer_id,
 								date_time
+							DESC
 						) latest_values
 					) - 
 					(
@@ -183,6 +184,7 @@ async function updatePowerPlants() {
 							ORDER BY
 								prosumer_id,
 								date_time
+							DESC
 						) latest_values
 					)
 				)
