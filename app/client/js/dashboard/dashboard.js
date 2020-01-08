@@ -117,6 +117,18 @@ async function updateData() {
   const batteryPower = battery.power.toFixed(2);
   const batteryMaxCapacity = battery.maxCapacity.toFixed(2);
   document.getElementById(
+    "windspeed"
+  ).innerHTML = `${prosumer.latestProduction.value.toFixed(2)}`;
+  document.getElementById(
+    "production"
+  ).innerHTML = `${prosumer.latestProduction.value.toFixed(2)}`;
+  document.getElementById(
+    "consumption"
+  ).innerHTML = `${prosumer.latestConsumption.value.toFixed(2)}`;
+  document.getElementById("netProduction").innerHTML = `${(
+    prosumer.latestProduction.value - prosumer.latestConsumption.value
+  ).toFixed(2)}`;
+  document.getElementById(
     "battery"
   ).innerHTML = `${batteryPower}/${batteryMaxCapacity}`;
 

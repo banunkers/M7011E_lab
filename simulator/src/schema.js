@@ -143,6 +143,15 @@ const prosumerType = new GraphQLObjectType({
           }
 				`
     },
+    latestWindSpeed: {
+      type: windSpeedValueType,
+      sqlTable: "windspeed_values",
+      sqlJoin: (prosumerTable, windSpeedValuesTable, args) =>
+        `${prosumerTable}.id = ${windSpeedValuesTable}.prosumer_id`,
+      orderBy: {
+        date_time: "desc"
+      }
+    },
     production: {
       type: GraphQLList(productionValueType),
       sqlTable: "production_values",
@@ -164,6 +173,15 @@ const prosumerType = new GraphQLObjectType({
           }
 				`
     },
+    latestProduction: {
+      type: productionValueType,
+      sqlTable: "production_values",
+      sqlJoin: (prosumerTable, productionValuesTable, args) =>
+        `${prosumerTable}.id = ${productionValuesTable}.prosumer_id`,
+      orderBy: {
+        date_time: "desc"
+      }
+    },
     consumption: {
       type: GraphQLList(consumptionValueType),
       sqlTable: "consumption_values",
@@ -184,6 +202,15 @@ const prosumerType = new GraphQLObjectType({
               : ""
           }
 				`
+    },
+    latestConsumption: {
+      type: consumptionValueType,
+      sqlTable: "consumption_values",
+      sqlJoin: (prosumerTable, consumptionValuesTable, args) =>
+        `${prosumerTable}.id = ${consumptionValuesTable}.prosumer_id`,
+      orderBy: {
+        date_time: "desc"
+      }
     },
     ratioExcessMarket: {
       type: GraphQLFloat,
