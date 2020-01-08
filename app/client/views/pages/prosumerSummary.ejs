@@ -14,6 +14,8 @@
 	<script type="text/javascript" src="/js/prosumerSummary/deleteAccount.js"></script>
 	<script type="text/javascript" src="/js/prosumerSummary/ratios.js"
 		prosumerId=<%=prosumer.id%> ></script>
+	<script type="text/javascript" src="/js/prosumerSummary/graph.js"
+		prosumerId=<%=prosumer.id%> ></script>
 </head>
 <body>
 	<h1><%= prosumer.id %> - <%= prosumer.account.email %></h1>
@@ -21,6 +23,7 @@
 		src=<%= typeof image !== "undefined" && image != "" ? image : "#"%>
 	>
 	<%- include("../partials/prosumerStatsTable") %>
+	<%- include("../partials/graph") %>
 	<div>
 		<h3>Excessive production</h3>
 		<label id="displayExcessBatteryRatio" for="ratioExcess">0</label>
