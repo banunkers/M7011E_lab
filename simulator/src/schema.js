@@ -122,7 +122,7 @@ const prosumerType = new GraphQLObjectType({
       type: GraphQLFloat,
       sqlColumn: "mean_day_wind_speed"
     },
-    currentWindSpeed: {
+    windSpeed: {
       type: GraphQLList(windSpeedValueType),
       sqlTable: "windspeed_values",
       args: {
@@ -143,7 +143,7 @@ const prosumerType = new GraphQLObjectType({
           }
 				`
     },
-    currentProduction: {
+    production: {
       type: GraphQLList(productionValueType),
       sqlTable: "production_values",
       args: {
@@ -164,7 +164,7 @@ const prosumerType = new GraphQLObjectType({
           }
 				`
     },
-    currentConsumption: {
+    consumption: {
       type: GraphQLList(consumptionValueType),
       sqlTable: "consumption_values",
       args: {

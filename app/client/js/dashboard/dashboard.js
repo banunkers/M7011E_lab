@@ -26,14 +26,14 @@ async function handleDateChange(
         authToken
       },
       body: JSON.stringify({
-        query: createProsumerQuery("currentProduction", startTime, endTime)
+        query: createProsumerQuery("production", startTime, endTime)
       })
     });
     const json = await response.json();
     replaceChartDataset(
       chart,
       "Production",
-      json.data.me.currentProduction,
+      json.data.me.production,
       PRODUCTION_COLOR
     );
   }
@@ -46,14 +46,14 @@ async function handleDateChange(
         authToken
       },
       body: JSON.stringify({
-        query: createProsumerQuery("currentConsumption", startTime, endTime)
+        query: createProsumerQuery("consumption", startTime, endTime)
       })
     });
     const json = await response.json();
     replaceChartDataset(
       chart,
       "Consumption",
-      json.data.me.currentConsumption,
+      json.data.me.consumption,
       CONSUMPTION_COLOR
     );
   }
@@ -66,14 +66,14 @@ async function handleDateChange(
         authToken
       },
       body: JSON.stringify({
-        query: createProsumerQuery("currentWindSpeed", startTime, endTime)
+        query: createProsumerQuery("windSpeed", startTime, endTime)
       })
     });
     const json = await response.json();
     replaceChartDataset(
       chart,
       "Windspeed",
-      json.data.me.currentWindSpeed,
+      json.data.me.windSpeed,
       WINDSPEED_COLOR
     );
   }
@@ -136,7 +136,7 @@ async function updateData() {
           authToken
         },
         body: JSON.stringify({
-          query: createProsumerQuery("currentWindSpeed", startTime, endTime)
+          query: createProsumerQuery("windSpeed", startTime, endTime)
         })
       });
       const json = await response.json();
@@ -144,7 +144,7 @@ async function updateData() {
       replaceChartDataset(
         chart,
         "Windspeed",
-        json.data.me.currentWindSpeed,
+        json.data.me.windSpeed,
         WINDSPEED_COLOR
       );
     }
@@ -156,7 +156,7 @@ async function updateData() {
           authToken
         },
         body: JSON.stringify({
-          query: createProsumerQuery("currentProduction", startTime, endTime)
+          query: createProsumerQuery("production", startTime, endTime)
         })
       });
       const json = await response.json();
@@ -164,7 +164,7 @@ async function updateData() {
       replaceChartDataset(
         chart,
         "Production",
-        json.data.me.currentProduction,
+        json.data.me.production,
         PRODUCTION_COLOR
       );
     }
@@ -176,7 +176,7 @@ async function updateData() {
           authToken
         },
         body: JSON.stringify({
-          query: createProsumerQuery("currentConsumption", startTime, endTime)
+          query: createProsumerQuery("consumption", startTime, endTime)
         })
       });
       const json = await response.json();
@@ -184,7 +184,7 @@ async function updateData() {
       replaceChartDataset(
         chart,
         "Consumption",
-        json.data.me.currentConsumption,
+        json.data.me.consumption,
         CONSUMPTION_COLOR
       );
     }
@@ -289,7 +289,7 @@ async function handleProductionCheckbox() {
 				{
 					me{
 						... on prosumer{
-							currentProduction${
+							production${
                 startTime != "" || endTime != ""
                   ? `(
 								${startTime != "" ? `startTime: "${startTime}"` : ""}
@@ -308,7 +308,7 @@ async function handleProductionCheckbox() {
     });
     const json = await response.json();
 
-    let data = json.data.me.currentProduction;
+    let data = json.data.me.production;
     // If neither the start nor the end dates are set use the 50 latest samples
     if (startTime == "" && endTime == "") {
       data = data
@@ -337,7 +337,7 @@ async function handleConsumptionCheckbox() {
 				{
 					me{
 						... on prosumer{
-							currentConsumption${
+							consumption${
                 startTime != "" || endTime != ""
                   ? `(
 								${startTime != "" ? `startTime: "${startTime}"` : ""}
@@ -356,7 +356,7 @@ async function handleConsumptionCheckbox() {
     });
     const json = await response.json();
 
-    let data = json.data.me.currentConsumption;
+    let data = json.data.me.consumption;
     // If neither the start nor the end dates are set use the 50 latest samples
     if (startTime == "" && endTime == "") {
       data = data
@@ -385,7 +385,7 @@ async function handleWindspeedCheckbox() {
 				{
 					me{
 						... on prosumer{
-							currentWindSpeed${
+							windSpeed${
                 startTime != "" || endTime != ""
                   ? `(
 								${startTime != "" ? `startTime: "${startTime}"` : ""}
@@ -404,7 +404,7 @@ async function handleWindspeedCheckbox() {
     });
     const json = await response.json();
 
-    let data = json.data.me.currentWindSpeed;
+    let data = json.data.me.windSpeed;
     // If neither the start nor the end dates are set use the 50 latest samples
     if (startTime == "" && endTime == "") {
       data = data
