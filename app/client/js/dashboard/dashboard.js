@@ -7,9 +7,6 @@ const WINDSPEED_COLOR = "blue";
 // The length (in milliseconds) of the intervals between polling
 const POLL_INTERVAL = 4000;
 
-document.addEventListener("DOMContentLoaded", () => {
-  pollFunc(updateData, POLL_INTERVAL); // poll prosumer data on intervals
-});
 document.addEventListener("DOMContentLoaded", async () => {
   const authToken = getCookie("authToken", document.cookie);
 
@@ -33,6 +30,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   handleWindspeedCheckbox.call({
     checked: windspeedCheckbox.checked
   });
+
+  pollFunc(updateData, POLL_INTERVAL); // poll prosumer data on intervals
 });
 
 async function updateData() {
