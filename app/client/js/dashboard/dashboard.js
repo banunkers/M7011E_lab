@@ -7,20 +7,93 @@ const WINDSPEED_COLOR = "blue";
 // The length (in milliseconds) of the intervals between polling
 const POLL_INTERVAL = 4000;
 
-document.addEventListener("DOMContentLoaded", async () => {
+async function handleDateChange(
+  productionChecked,
+  consumptionChecked,
+  windspeedChecked,
+  startTime,
+  endTime
+) {
   const authToken = getCookie("authToken", document.cookie);
 
-  attachStartDateSelectChangeListeners();
-  attachEndDateSelectChangeListeners();
+  //TODO: These queries should be able to be merged into one using subfields, but
+  // for some reason using subfields seems to affect performance heavily.
+  if (productionChecked) {
+    const response = await fetch(API_ADDRESS, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authToken
+      },
+      body: JSON.stringify({
+        query: createProsumerQuery("currentProduction", startTime, endTime)
+      })
+    });
+    const json = await response.json();
+    replaceChartDataset(
+      chart,
+      "Production",
+      json.data.me.currentProduction,
+      PRODUCTION_COLOR
+    );
+  }
+
+  if (consumptionChecked) {
+    const response = await fetch(API_ADDRESS, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authToken
+      },
+      body: JSON.stringify({
+        query: createProsumerQuery("currentConsumption", startTime, endTime)
+      })
+    });
+    const json = await response.json();
+    replaceChartDataset(
+      chart,
+      "Consumption",
+      json.data.me.currentConsumption,
+      CONSUMPTION_COLOR
+    );
+  }
+
+  if (windspeedChecked) {
+    const response = await fetch(API_ADDRESS, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authToken
+      },
+      body: JSON.stringify({
+        query: createProsumerQuery("currentWindSpeed", startTime, endTime)
+      })
+    });
+    const json = await response.json();
+    replaceChartDataset(
+      chart,
+      "Windspeed",
+      json.data.me.currentWindSpeed,
+      WINDSPEED_COLOR
+    );
+  }
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  attachStartDateSelectChangeCallback(handleDateChange);
+  attachEndDateSelectChangeCallback(handleDateChange);
+
+  chart = initChart(
+    handleProductionCheckbox,
+    handleConsumptionCheckbox,
+    handleWindspeedCheckbox
+  );
 
   const productionCheckbox = document.getElementById("production-checkbox");
-  productionCheckbox.addEventListener("click", handleProductionCheckbox);
   const consumptionCheckbox = document.getElementById("consumption-checkbox");
-  consumptionCheckbox.addEventListener("click", handleConsumptionCheckbox);
   const windspeedCheckbox = document.getElementById("windspeed-checkbox");
-  windspeedCheckbox.addEventListener("click", handleWindspeedCheckbox);
-  initChart();
 
+  // Initialize the datasets based on the checkboxes
   handleProductionCheckbox.call({
     checked: productionCheckbox.checked
   });
@@ -69,6 +142,7 @@ async function updateData() {
       const json = await response.json();
 
       replaceChartDataset(
+        chart,
         "Windspeed",
         json.data.me.currentWindSpeed,
         WINDSPEED_COLOR
@@ -88,6 +162,7 @@ async function updateData() {
       const json = await response.json();
 
       replaceChartDataset(
+        chart,
         "Production",
         json.data.me.currentProduction,
         PRODUCTION_COLOR
@@ -107,6 +182,7 @@ async function updateData() {
       const json = await response.json();
 
       replaceChartDataset(
+        chart,
         "Consumption",
         json.data.me.currentConsumption,
         CONSUMPTION_COLOR
@@ -150,186 +226,6 @@ async function getDashboardData() {
     console.error(`Failed to get prosumer data: ${err}`);
   }
   return prosumerData;
-}
-
-async function initChart() {
-  const timeFormat = "DD/MM/YYYY";
-
-  var ctx = document.getElementById("myChart").getContext("2d");
-
-  chart = new Chart(ctx, {
-    type: "line",
-    data: {
-      labels: []
-    },
-    options: {
-      resposive: true,
-      scales: {
-        xAxes: [
-          {
-            type: "time",
-            parser: timeFormat
-          }
-        ]
-      }
-    }
-  });
-}
-
-function attachStartDateSelectChangeListeners() {
-  const authToken = getCookie("authToken", document.cookie);
-
-  document.getElementById("start-date-select").onchange = async function() {
-    const endTime = document.getElementById("end-date-select").value;
-
-    const consumptionChecked = document.getElementById("consumption-checkbox")
-      .checked;
-    const productionChecked = document.getElementById("production-checkbox")
-      .checked;
-    const windspeedChecked = document.getElementById("windspeed-checkbox")
-      .checked;
-
-    //TODO: These queries should be able to be merged into one using subfields, but
-    // for some reason using subfields seems to affect performance heavily.
-    if (productionChecked) {
-      const response = await fetch(API_ADDRESS, {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          authToken
-        },
-        body: JSON.stringify({
-          query: createProsumerQuery("currentProduction", this.value, endTime)
-        })
-      });
-      const json = await response.json();
-      replaceChartDataset(
-        "Production",
-        json.data.me.currentProduction,
-        PRODUCTION_COLOR
-      );
-    }
-
-    if (consumptionChecked) {
-      const response = await fetch(API_ADDRESS, {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          authToken
-        },
-        body: JSON.stringify({
-          query: createProsumerQuery("currentConsumption", this.value, endTime)
-        })
-      });
-      const json = await response.json();
-      replaceChartDataset(
-        "Consumption",
-        json.data.me.currentConsumption,
-        CONSUMPTION_COLOR
-      );
-    }
-
-    if (windspeedChecked) {
-      const response = await fetch(API_ADDRESS, {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          authToken
-        },
-        body: JSON.stringify({
-          query: createProsumerQuery("currentWindSpeed", this.value, endTime)
-        })
-      });
-      const json = await response.json();
-      replaceChartDataset(
-        "Windspeed",
-        json.data.me.currentWindSpeed,
-        WINDSPEED_COLOR
-      );
-    }
-
-    chart.update();
-  };
-}
-
-function attachEndDateSelectChangeListeners() {
-  const authToken = getCookie("authToken", document.cookie);
-
-  document.getElementById("end-date-select").onchange = async function() {
-    const startTime = document.getElementById("start-date-select").value;
-
-    const consumptionChecked = document.getElementById("consumption-checkbox")
-      .checked;
-    const productionChecked = document.getElementById("production-checkbox")
-      .checked;
-    const windspeedChecked = document.getElementById("windspeed-checkbox")
-      .checked;
-
-    //TODO: These queries should be able to be merged into one using subfields, but
-    // for some reason using subfields seems to affect performance heavily.
-    if (productionChecked) {
-      const response = await fetch(API_ADDRESS, {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          authToken
-        },
-        body: JSON.stringify({
-          query: createProsumerQuery("currentProduction", startTime, this.value)
-        })
-      });
-      const json = await response.json();
-      replaceChartDataset(
-        "Production",
-        json.data.me.currentProduction,
-        PRODUCTION_COLOR
-      );
-    }
-
-    if (consumptionChecked) {
-      const response = await fetch(API_ADDRESS, {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          authToken
-        },
-        body: JSON.stringify({
-          query: createProsumerQuery(
-            "currentConsumption",
-            startTime,
-            this.value
-          )
-        })
-      });
-      const json = await response.json();
-      replaceChartDataset(
-        "Consumption",
-        json.data.me.currentConsumption,
-        CONSUMPTION_COLOR
-      );
-    }
-
-    if (windspeedChecked) {
-      const response = await fetch(API_ADDRESS, {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          authToken
-        },
-        body: JSON.stringify({
-          query: createProsumerQuery("currentWindSpeed", startTime, this.value)
-        })
-      });
-      const json = await response.json();
-      replaceChartDataset(
-        "Windspeed",
-        json.data.me.currentWindSpeed,
-        WINDSPEED_COLOR
-      );
-    }
-
-    chart.update();
-  };
 }
 
 /*
@@ -377,34 +273,6 @@ function createProsumerQuery(field, startTime, endTime) {
 	`;
 }
 
-function replaceChartDataset(label, data, color) {
-  let found = false;
-  chart.data.datasets.forEach(ds => {
-    if (ds.label === label) {
-      found = true;
-      ds.borderColor = color;
-      ds.data = prepareChartData(data);
-    }
-  });
-  if (!found) {
-    chart.data.datasets.push({
-      label,
-      data: prepareChartData(data),
-      fill: false,
-      borderColor: color,
-      lineTension: 0.1
-    });
-  }
-  chart.update();
-}
-
-function removeChartDataset(label) {
-  chart.data.datasets = chart.data.datasets.filter(
-    dataset => dataset.label != label
-  );
-  chart.update();
-}
-
 async function handleProductionCheckbox() {
   const authToken = getCookie("authToken", document.cookie);
   if (this.checked) {
@@ -447,9 +315,9 @@ async function handleProductionCheckbox() {
         .sort((e1, e2) => parseInt(e1.dateTime) - parseInt(e2.dateTime))
         .slice(-50);
     }
-    replaceChartDataset("Production", data, PRODUCTION_COLOR);
+    replaceChartDataset(chart, "Production", data, PRODUCTION_COLOR);
   } else {
-    removeChartDataset("Production");
+    removeChartDataset(chart, "Production");
   }
 }
 
@@ -495,9 +363,9 @@ async function handleConsumptionCheckbox() {
         .sort((e1, e2) => parseInt(e1.dateTime) - parseInt(e2.dateTime))
         .slice(-50);
     }
-    replaceChartDataset("Consumption", data, CONSUMPTION_COLOR);
+    replaceChartDataset(chart, "Consumption", data, CONSUMPTION_COLOR);
   } else {
-    removeChartDataset("Consumption");
+    removeChartDataset(chart, "Consumption");
   }
 }
 
@@ -543,30 +411,8 @@ async function handleWindspeedCheckbox() {
         .sort((e1, e2) => parseInt(e1.dateTime) - parseInt(e2.dateTime))
         .slice(-50);
     }
-    replaceChartDataset("Windspeed", data, WINDSPEED_COLOR);
+    replaceChartDataset(chart, "Windspeed", data, WINDSPEED_COLOR);
   } else {
-    removeChartDataset("Windspeed");
+    removeChartDataset(chart, "Windspeed");
   }
-}
-
-/*
- * Prepares data for being displayed in the chart.
- *
- * Sorts the input array's objects by their dateTime member, and then maps it to objects
- * with a member x containing the date as a moment, and member y containing the value.
- *
- * @param data The input array consisting of object with members dateTime and value.
- *
- * @return An array ready for being displayed in a chart.
- */
-function prepareChartData(data) {
-  // Sort by date
-  const sorted = data.sort(
-    (e1, e2) => parseInt(e1.dateTime) - parseInt(e2.dateTime)
-  );
-
-  return sorted.map(e => ({
-    x: moment(parseInt(e.dateTime)),
-    y: e.value
-  }));
 }

@@ -9,8 +9,6 @@
     ></script>
     <script type="text/javascript" src="/js/dashboard/ratios.js"></script>
     <script type="text/javascript" src="/js/dashboard/dashboard.js"></script>
-		<script src="https://cdn.jsdelivr.net/npm/moment@2.24.0"></script>
-		<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
     <meta charset="UTF-8" />
     <title>Dashboard</title>
   </head>
@@ -21,27 +19,7 @@
 				<h2>Overview</h3>
         <%- include("../partials/prosumerStatsTable") %>
       </div>
-			<div>
-				<label for="start-date-select">Start date:</label>
-				<input id="start-date-select" type="date">
-			</div>
-			<div>
-				<label for="end-date-select">End date:</label>
-				<input id="end-date-select" type="date">
-			</div>
-			<div>
-				<label for="windspeed-checkbox">Wind speed</label>
-				<input id="windspeed-checkbox" type="checkbox">
-			</div>
-			<div>
-				<label for="production-checkbox">Production</label>
-				<input id="production-checkbox" type="checkbox">
-			</div>
-			<div>
-				<label for="consumption-checkbox">Consumption</label>
-				<input id="consumption-checkbox" type="checkbox">
-			</div>
-			<canvas id="myChart" width="400" height="400" style="max-width: 700px; max-height: 700px;"></canvas>
+			<%- include("../partials/graph") %>
       <div>
 				<h2>Ratios</h2>
         <div>
