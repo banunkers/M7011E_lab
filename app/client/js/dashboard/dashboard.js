@@ -153,48 +153,7 @@ async function getDashboardData() {
 }
 
 async function initChart() {
-  const authToken = getCookie("authToken", document.cookie);
   const timeFormat = "DD/MM/YYYY";
-
-  const startTime = document.getElementById("start-date-select").value;
-  const endTime = document.getElementById("end-date-select").value;
-  const response = await fetch(API_ADDRESS, {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      authToken
-    },
-    body: JSON.stringify({
-      query: `
-				{
-					me{
-						... on prosumer{
-							currentWindSpeed${
-                startTime != "" || endTime != ""
-                  ? `(
-								${startTime != "" ? `startTime: "${startTime}"` : ""}
-								${endTime != "" ? `endTime: "${endTime}"` : ""}
-							)`
-                  : ""
-              }{
-								value
-								dateTime
-							}
-						}
-					}
-				}
-				`
-    })
-  });
-  const json = await response.json();
-
-  let data = json.data.me.currentWindSpeed;
-  // If neither the start nor the end dates are set use the 50 latest samples
-  if (startTime == "" && endTime == "") {
-    data = data
-      .sort((e1, e2) => parseInt(e1.dateTime) - parseInt(e2.dateTime))
-      .slice(-50);
-  }
 
   var ctx = document.getElementById("myChart").getContext("2d");
 
