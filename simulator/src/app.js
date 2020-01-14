@@ -7,20 +7,29 @@ const { startSimulation } = require("./simulator.js");
 const { authMiddleWare } = require("./api/auth.js");
 const { getImage, getProsumerImage } = require("./api/getPicture.js");
 const { pool } = require("./db.js");
+const SERVER_HOST = process.env.APP_HOST || "http://localhost:3000";
+const SERVER_PORT = process.env.APP_PORT || 3000;
+const cookieparser = require("cookie-parser");
 
 const app = express();
 const port = 8080;
 
+// Parse the cookie header in the request object to an object
+app.use(cookieparser());
+
 app.use(authMiddleWare);
 // Increase the maximum request limit in order to serve images
 app.use(bodyParser.json({ limit: "5mb" }));
-app.use(cors());
+app.use(
+  cors({ origin: `http://${SERVER_HOST}:${SERVER_PORT}`, credentials: true })
+);
 app.use(
   "/graphql",
-  expressGraphQL(req => ({
+  expressGraphQL((req, res) => ({
     schema,
     context: {
-      user: req.user
+      user: req.user,
+      res
     },
     graphiql: true
   }))

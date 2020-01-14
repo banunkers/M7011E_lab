@@ -10,22 +10,24 @@ async function getRatios() {
 			}
 		}
 	}`;
-  const authToken = getCookie("authToken", document.cookie);
 
   let ratios = null;
   try {
     await fetch(API_ADDRESS, {
       method: "POST",
       headers: {
-        "content-type": "application/json",
-        authToken
+        "content-type": "application/json"
       },
       body: JSON.stringify({
         query: QUERY_GET_RATIOS
-      })
+      }),
+      credentials: "include"
     })
       .then(res => res.json())
-      .then(res => (ratios = res.data.me));
+      .then(res => {
+        console.log(res);
+        ratios = res.data.me;
+      });
   } catch (err) {
     console.error(`Failed to get ratios: ${err}`);
   }

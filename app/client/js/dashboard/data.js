@@ -17,15 +17,14 @@ async function getData() {
 	${prosumerFields},
 	${managerFields}
 	`;
-  const authToken = getCookie("authToken", document.cookie);
   let data = null;
   try {
     await fetch(API_ADDRESS, {
       method: "POST",
       headers: {
-        "content-type": "application/json",
-        authToken
+        "content-type": "application/json"
       },
+      credentials: "include",
       body: JSON.stringify({
         query: GET_DATA_QUERY
       })

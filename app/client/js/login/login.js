@@ -12,13 +12,13 @@ function submitLogin(event, form) {
   fetch(API_ADDRESS, {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ query })
+    body: JSON.stringify({ query }),
+    credentials: "include"
   })
     .then(res => res.json())
     .then(res => {
-      const token = res.data.login || null;
-      if (token) {
-        document.cookie = `authToken=${res.data.login}`;
+      const { login } = res.data;
+      if (login) {
         window.location.replace("/profile");
       } else {
         alert("Invalid credentials");

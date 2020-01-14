@@ -389,8 +389,8 @@ const mutationType = new GraphQLObjectType({
         email: { type: GraphQLNonNull(GraphQLString) },
         password: { type: GraphQLNonNull(GraphQLString) }
       },
-      resolve(_obj, args) {
-        return logInUser(args.email, args.password);
+      resolve(_obj, args, { res }) {
+        return logInUser(res, args.email, args.password);
       }
     },
     registerProsumer: {

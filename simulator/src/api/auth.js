@@ -7,8 +7,8 @@ const privateKey = process.env.SECRET || "secret";
 const JWT_ALGORITHM = "HS256";
 
 function authMiddleWare(req, res, next) {
-  if (req.headers.authtoken) {
-    const token = req.headers.authtoken;
+  if (req.cookies.authToken) {
+    const token = req.cookies.authToken;
     const user = jwt.verify(token, privateKey);
 
     // Validate the fields of the token
@@ -74,16 +74,18 @@ async function checkAccountCredentials(accountId, password) {
   }
 }
 
-async function logInUser(email, password) {
+async function logInUser(res, email, password) {
   if (email && password) {
     try {
-      const res = await pool.query("SELECT id FROM accounts WHERE email=$1", [
-        email
-      ]);
-      if (res.rows.length === 0) {
-        return null;
+      const result = await pool.query(
+        "SELECT id FROM accounts WHERE email=$1",
+        [email]
+      );
+      if (result.rows.length === 0) {
+        return false;
       }
-      const { id } = res.rows[0];
+      const { id } = result.rows[0];
+      console.log("UWAHIUWHDIUHWIDUh");
       if (await checkAccountCredentials(id, password)) {
         const isAdmin = await userIsManager(email);
         const token = jwt.sign(
@@ -93,13 +95,17 @@ async function logInUser(email, password) {
             algorithm: JWT_ALGORITHM
           }
         );
-        return token;
+        console.log(res);
+        res.cookie("authToken", token, {
+          httpOnly: true
+        });
+        return true;
       }
     } catch (error) {
       console.log(`User login failed ${error}`);
     }
   }
-  return null;
+  return false;
 }
 
 module.exports = {
